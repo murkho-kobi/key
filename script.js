@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    // ১. প্যানেলের সুন্দর ডিজাইন (CSS) যুক্ত করা
+    // ১. প্যানেলের সুন্দর ডিজাইন (CSS)
     const style = document.createElement('style');
     style.innerHTML = `
         #my-auth-panel {
@@ -39,11 +39,10 @@
     `;
     document.body.appendChild(panel);
 
-    // ৩. VERIFY & RUN বোতামের কাজ সেট করা
+    // ৩. VERIFY & RUN বোতামের কাজ
     document.getElementById('verify-btn').addEventListener('click', function() {
         const inputKey = document.getElementById('license-input').value.trim();
 
-        // ⚠️ আপনার পাসওয়ার্ডটি এখানে সেট করুন (যেমন আপনার বন্ধুর ছিল 'Alone')
         if (inputKey.toLowerCase() === 'alone' || inputKey.toLowerCase() === 'open') {
             startCountdown();
         } else {
@@ -51,7 +50,7 @@
         }
     });
 
-    // ৪. কাউন্টডাউন টাইমার এবং অটো-ক্লিক ফাংশন
+    // ৪. কাউন্টডাউন টাইমার এবং অল-ইন-ওয়ান অটো-ক্লিক ফাংশন
     function startCountdown() {
         const content = document.getElementById('auth-content');
         content.innerHTML = `
@@ -59,7 +58,7 @@
             <div id="my-status">REDIRECTING...</div>
         `;
 
-        let timeLeft = 25; // আপনার বন্ধুর মতো ২৫ সেকেন্ডের টাইমার
+        let timeLeft = 25; 
         const countdown = setInterval(function() {
             timeLeft--;
             document.getElementById('my-timer').textContent = timeLeft;
@@ -68,17 +67,27 @@
                 clearInterval(countdown);
                 document.getElementById('my-status').textContent = "CLICKING...";
                 
-                // টাইমার শেষ হলে স্বয়ংক্রিয়ভাবে পেজের বাটন খুঁজে ক্লিক করবে
-                let buttons = document.querySelectorAll('button, a');
-                for (let button of buttons) {
-                    if (button.textContent.includes('Continue to Step') || button.textContent.includes('Continue')) {
-                        button.click();
+                // শক্তিশালী বাটন সার্চ মেকানিজম (সব ধরণের বাটন ও এংকর ট্যাগ চেক করবে)
+                let elements = document.querySelectorAll('button, a, div, span, input[type="button"]');
+                let targets = ['Continue to Step', 'Continue', 'Get Key', 'Verify', 'Next Step', 'Get Link', 'Próximo', 'Passo'];
+                let clicked = false;
+
+                for (let el of elements) {
+                    let txt = el.textContent.trim();
+                    if (targets.some(target => txt.includes(target)) && el.offsetWidth > 0 && el.offsetHeight > 0) {
+                        el.click();
+                        clicked = true;
                         break;
                     }
                 }
+
+                // যদি নির্দিষ্ট টেক্সট না পায়, তবে পেজের যেকোনো অ্যাক্টিভ লিংক বা সাবমিট বাটন ট্রাই করবে
+                if (!clicked) {
+                    let fallbackBtn = document.querySelector('.btn, .button, input[type="submit"]');
+                    if (fallbackBtn) fallbackBtn.click();
+                }
                 
-                // ৫ সেকেন্ড পর প্যানেলটি স্ক্রিন থেকে গায়েব হয়ে যাবে
-                setTimeout(() => { panel.remove(); }, 5000);
+                setTimeout(() => { panel.remove(); }, 3000);
             }
         }, 1000);
     }
