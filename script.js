@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    // ১. একদম সাধারণ ডিজাইন (কোনো কালার বা গ্লো নেই)
+    // ১. একদম সাধারণ কালো-সাদা ডিজাইন
     const style = document.createElement('style');
     style.innerHTML = `
         #my-auth-panel {
@@ -39,15 +39,15 @@
         }
     });
 
-    // ৪. বাইপাস ফাংশন
+    // ৪. সরাসরি শেষ পেজে রিডাইরেক্ট করার বাইপাস ফাংশন
     function startBypassProcess() {
         const content = document.getElementById('auth-content');
         content.innerHTML = `
-            <div id="my-timer">20</div>
-            <div id="my-status">BYPASSING STEPS...</div>
+            <div id="my-timer">15</div>
+            <div id="my-status">BYPASSING TO FINAL PAGE...</div>
         `;
 
-        let timeLeft = 20; 
+        let timeLeft = 15; 
         const countdown = setInterval(function() {
             timeLeft--;
             document.getElementById('my-timer').textContent = timeLeft;
@@ -55,6 +55,8 @@
         }, 1000);
 
         let currentUrl = window.location.href;
+        
+        // ফ্রি শক্তিশালী ইউনিভার্সাল বাইপাস এপিআই
         let bypassApiUrl = "https://bypass.vip" + encodeURIComponent(currentUrl);
 
         fetch(bypassApiUrl)
@@ -62,24 +64,23 @@
             .then(data => {
                 clearInterval(countdown);
                 if (data && data.destination) {
+                    // মাঝখানের পেজগুলো স্কিপ করে সরাসরি শেষ পেজে রিডাইরেক্ট
                     window.location.href = data.destination; 
                 } else {
-                    fetch("https://workers.dev" + encodeURIComponent(currentUrl))
+                    // ব্যাকআপ এপিআই যদি প্রথমটি ব্যস্ত থাকে
+                    fetch("https://bypass.vip" + encodeURIComponent(currentUrl))
                         .then(r => r.json())
                         .then(d => {
-                            if(d.bypassed_url) window.location.href = d.bypassed_url;
+                            if(d.destination) window.location.href = d.destination;
+                            else document.getElementById('my-status').textContent = "TRY AGAIN IN BASE CHROMIUM";
+                        }).catch(() => {
+                            document.getElementById('my-status').textContent = "FAILED TO BYPASS LINK";
                         });
                 }
             })
             .catch(() => {
                 clearInterval(countdown);
-                let buttons = document.querySelectorAll('button, a');
-                for (let b of buttons) {
-                    if (b.textContent.includes('Continue to Step') || b.textContent.includes('Continue')) {
-                        b.click();
-                        break;
-                    }
-                }
+                document.getElementById('my-status').textContent = "CONNECTION ERROR";
             });
     }
 })();
